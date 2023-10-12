@@ -29,8 +29,63 @@ const { response } = require("express");
 //     });
 //   }
 // });
+const register = asyncHandler(async (req, res) => {
+  const { email, password, firstname, lastname, mobile } = req.body;
+  if (!email || !password || !firstname || !lastname || !mobile) {
+    return res.status(400).json({
+      success: false,
+      mes: "Missing input",
+    });
+  }
+  const user = await User.findOne({ email });
+  const isMobile = await User.findOne({ mobile });
+  if (isMobile) {
+    throw new Error("Mobile has been already");
+  } else if (user) {
+    throw new Error("Email has been already");
+  } else {
+    const token = makeToken();
+    // res.cookie(
+    //   "dataregister",
+    //   { ...req.body, token },
+    //   {
+    //     httpOnly: true,
+    //     maxAge: 15 * 60 * 1000,
+    //   }
+    // );
+
+    // const html = `
+    // Xin click vào link dưới đây để hoàn tất quá trình đăng ký.Link sẽ hết hạn sau 15 phút kể từ bây giờ <a href = "${process.env.URL_SERVER}/api/user/finalregister/${token}">Click here</a> `;
+    // cách 2 đăng kí và lưu cookie dưới db
+    const emailEdit = btoa(email) + "@" + token;
+    const newUser = await User.create({
+      email: emailEdit,
+      password,
+      firstname,
+      lastname,
+      mobile,
+    });
+
+    if (newUser) {
+      const html = `<h2>Register Code:</h2><br/><blockquote>${token}</blockquote>`;
+      await sendMail({
+        email,
+        html,
+        subject: "Confirm register password Digital Word ",
+      });
+    }
+    setTimeout(async () => {
+      await User.deleteOne({ email: emailEdit });
+    }, [300000]);
+    return res.json({
+      success: newUser ? true : false,
+      mes: newUser ? "Please check your email" : "Please, Try again!",
+    });
+  }
+});
 // const register = asyncHandler(async (req, res) => {
 //   const { email, password, firstname, lastname, mobile } = req.body;
+//   console.log(email, password, firstname, lastname, mobile);
 //   if (!email || !password || !firstname || !lastname || !mobile) {
 //     return res.status(400).json({
 //       success: false,
@@ -41,71 +96,19 @@ const { response } = require("express");
 //   if (user) {
 //     throw new Error("Email has been already");
 //   } else {
-//     const token = makeToken();
-//     // res.cookie(
-//     //   "dataregister",
-//     //   { ...req.body, token },
-//     //   {
-//     //     httpOnly: true,
-//     //     maxAge: 15 * 60 * 1000,
-//     //   }
-//     // );
-
-//     // const html = `
-//     // Xin click vào link dưới đây để hoàn tất quá trình đăng ký.Link sẽ hết hạn sau 15 phút kể từ bây giờ <a href = "${process.env.URL_SERVER}/api/user/finalregister/${token}">Click here</a> `;
-//     // cách 2 đăng kí và lưu cookie dưới db
-//     const emailEdit = btoa(email) + "@" + token;
 //     const newUser = await User.create({
-//       email: emailEdit,
+//       email,
 //       password,
 //       firstname,
 //       lastname,
 //       mobile,
 //     });
-
-//     if (newUser) {
-//       const html = `<h2>Register Code:</h2><br/><blockquote>${token}</blockquote>`;
-//       await sendMail({
-//         email,
-//         html,
-//         subject: "Confirm register password Digital Word ",
-//       });
-//     }
-//     setTimeout(async () => {
-//       await User.deleteOne({ email: emailEdit });
-//     }, [300000]);
 //     return res.json({
 //       success: newUser ? true : false,
-//       mes: newUser ? "Please check your email" : "Please, Try again!",
+//       mess: newUser ? "Created an accounnt " : "Please, Try again!",
 //     });
 //   }
 // });
-const register = asyncHandler(async (req, res) => {
-  const { email, password, firstname, lastname, mobile } = req.body;
-  console.log(email, password, firstname, lastname, mobile);
-  if (!email || !password || !firstname || !lastname || !mobile) {
-    return res.status(400).json({
-      success: false,
-      mes: "Missing input",
-    });
-  }
-  const user = await User.findOne({ email });
-  if (user) {
-    throw new Error("Email has been already");
-  } else {
-    const newUser = await User.create({
-      email,
-      password,
-      firstname,
-      lastname,
-      mobile,
-    });
-    return res.json({
-      success: newUser ? true : false,
-      mess: newUser ? "Created an accounnt " : "Please, Try again!",
-    });
-  }
-});
 const finalRegister = asyncHandler(async (req, res) => {
   // const cookie = req.cookies;
 

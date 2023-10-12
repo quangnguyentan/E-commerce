@@ -3,7 +3,7 @@ import Slider from "react-slick";
 import { Product } from "./";
 var settings = {
   dots: false,
-  infinite: false,
+  infinite: true,
   speed: 500,
   slidesToShow: 3,
   slidesToScroll: 1,
@@ -12,7 +12,7 @@ const CustomSlider = ({ product, activedTab }) => {
   return (
     <>
       {product && (
-        <Slider {...settings}>
+        <Slider className="custom-slider" {...settings}>
           {product?.map((el) => (
             <Product
               key={el._id}

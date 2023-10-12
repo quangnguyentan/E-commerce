@@ -46,6 +46,10 @@ var productSchema = new mongoose.Schema(
       type: Array,
       default: 0,
     },
+    imagescat: {
+      type: Array,
+      default: 0,
+    },
     color: {
       type: String,
     },

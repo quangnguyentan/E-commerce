@@ -33,19 +33,19 @@ var userSchema = new mongoose.Schema(
       default: "user",
     },
 
-    // cart: [
-    //   {
-    //     product: { type: mongoose.Types.ObjectId, ref: "Product" },
-    //     quantity: Number,
-    //     color: String,
-    //   },
-    // ],
-    // address: String,
-    // wishList: [{ type: mongoose.Types.ObjectId, ref: " Product" }],
-    // isBlocked: {
-    //   type: Boolean,
-    //   default: false,
-    // },
+    cart: [
+      {
+        product: { type: mongoose.Types.ObjectId, ref: "Product" },
+        quantity: Number,
+        color: String,
+      },
+    ],
+    address: String,
+    wishList: [{ type: mongoose.Types.ObjectId, ref: " Product" }],
+    isBlocked: {
+      type: Boolean,
+      default: false,
+    },
     refreshToken: {
       type: String,
     },
