@@ -20,6 +20,7 @@ const { BiArrowBack } = icons;
 const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  console.log(login());
   const [payload, setPayload] = useState({
     email: "",
     password: "",
@@ -106,7 +107,7 @@ const Login = () => {
   return (
     <div className="w-screen h-screen relative">
       {isVerifiedEmail && (
-        <div className="absolute top-0 left-0 right-0 bottom-0 bg-black opacity-80 z-50 flex flex-col  justify-center items-center">
+        <div className="absolute top-0 left-0 right-0 bottom-0 bg-black opacity-95 z-50 flex flex-col  justify-center items-center">
           <div className="bg-white w-[500px] rounded-md p-8">
             <h4>
               We sent a code to your email. Please, Check your email and enter
@@ -116,7 +117,7 @@ const Login = () => {
               type="text"
               value={token}
               onChange={(e) => setToken(e.target.value)}
-              className="p-2 border rounded-md outline-none "
+              className="p-2 border rounded-md outline-none mt-2 mr-2"
               placeholder="Enter your code...."
             />
             <button

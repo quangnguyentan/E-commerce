@@ -8,7 +8,7 @@ import icons from "../utils/icons";
 import { Link } from "react-router-dom";
 import path from "../utils/path";
 const { BsFillHeartFill, AiFillEye, BiMenu } = icons;
-const Product = ({ productData, isNew }) => {
+const Product = ({ productData, isNew, normal }) => {
   const [isShowOption, setIsNewOption] = useState(false);
   return (
     <div className="w-full text-base px-[10px]">
@@ -39,12 +39,14 @@ const Product = ({ productData, isNew }) => {
             alt=""
             className="w-[243px] h-[243px] object-cover "
           />
-          <img
-            src={isNew ? lableBlue : lable}
-            alt=""
-            className={`absolute top-0 right-0 w-[100px]
+          {!normal && (
+            <img
+              src={isNew ? lableBlue : lable}
+              alt=""
+              className={`absolute top-0 right-0 w-[100px]
            h-[35px] object-cover`}
-          />
+            />
+          )}
         </div>
         <div className="flex flex-col gap-1 mt-[15px] items-start w-full">
           <span className="line-clamp-1">{productData?.title}</span>

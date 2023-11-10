@@ -16,7 +16,6 @@ const Home = () => {
   const { categories } = useSelector((state) => state.app);
   const { isLoggedIn, current } = useSelector((state) => state.user);
 
-  console.log({ isLoggedIn, current });
   return (
     <>
       <div className="w-main flex">
@@ -53,7 +52,7 @@ const Home = () => {
                   <img
                     src={el?.image}
                     alt=""
-                    className="  h-[129px] object-contain "
+                    className="h-[129px] object-contain "
                   />
                   <div className="flex-1 text-gray-700">
                     <h4 className="font-semibold uppercase">{el.title}</h4>

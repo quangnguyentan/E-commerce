@@ -14,6 +14,7 @@ export const fomatMoney = (number) =>
 export const renderStartFromNumber = (number, size) => {
   if (!Number(number)) return;
   const starts = [];
+  number = Math.round(number);
   for (let i = 0; i < +number; i++)
     starts.push(<AiFillStar color="orange" size={size || 16} />);
   for (let i = 5; i > +number; i--)
@@ -69,3 +70,5 @@ export const validate = (payload, setInvalidFields) => {
 
   return invalids;
 };
+
+export const formatPrice = (number) => Math.round(number / 1000) * 1000;

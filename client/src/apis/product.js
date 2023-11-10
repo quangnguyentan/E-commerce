@@ -10,3 +10,9 @@ export const apiGetProductById = (id) =>
     url: "/product/" + id,
     method: "GET",
   });
+export const apiRatings = (data) =>
+  axios({
+    url: "/product/ratings",
+    method: "PUT",
+    data,
+  });

@@ -10,7 +10,6 @@ const Breadcrumbs = ({ title, category }) => {
     { path: "/:category/:id/:title", breadcrumb: title },
   ];
   const breadcrumbs = useBreadcrumbs(routes);
-  console.log(breadcrumbs);
   return (
     <div className="text-sm flex items-center">
       {breadcrumbs

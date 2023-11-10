@@ -32,6 +32,7 @@ export const userSlice = createSlice({
 
       state.isLoading = false;
       state.current = action.payload;
+      console.log("Payload: ", action.payload);
     });
 
     // Khi thực hiện action login thất bại (Promise rejected)

@@ -20,7 +20,13 @@ const createProduct = asyncHandler(async (req, res) => {
 });
 const getProductById = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const products = await Product.findById(id);
+  const products = await Product.findById(id).populate({
+    path: "rating",
+    populate: {
+      path: "postedBy",
+      select: "firstname lastname avatar",
+    },
+  });
   return res.status(200).json({
     success: products ? true : false,
     productDatas: products ? products : "Cannot get products by id",
@@ -65,7 +71,6 @@ const getProductById = asyncHandler(async (req, res) => {
 // });
 const getProducts = asyncHandler(async (req, res) => {
   const queries = { ...req.query };
-  // console.log(queries);
   const excludeFiels = ["limit", "sort", "page", "fields"];
   excludeFiels.forEach((e) => delete queries[e]);
   let queryString = JSON.stringify(queries);
@@ -73,15 +78,26 @@ const getProducts = asyncHandler(async (req, res) => {
     /\b(gte|gt|lt|lte)\b/g,
     (macthedEl) => `$${macthedEl}`
   );
-  const fomatedQueries = JSON.parse(queryString);
+  let fomatedQueries = JSON.parse(queryString);
+  let colorQueryObject = {};
   if (queries?.title) {
     fomatedQueries.title = { $regex: queries.title, $options: "i" };
   }
+  if (queries?.category)
+    fomatedQueries.category = { $regex: queries.category, $options: "i" };
+  if (queries?.color) {
+    delete fomatedQueries.color;
+    const colorArr = queries.color?.split(",");
+    const colorQuery = colorArr.map((el) => ({
+      color: { $regex: el, $options: "i" },
+    }));
+    colorQueryObject = { $or: colorQuery };
+  }
+  const q = { ...colorQueryObject, ...fomatedQueries };
+  let queryCommad = Product.find(q);
   try {
-    let queryCommad = Product.find(fomatedQueries);
     if (req.query.sort) {
       const sortBy = req.query.sort.split(",").join(" ");
-      console.log(sortBy);
       queryCommad = queryCommad.sort(sortBy);
       // console.log(queryCommad);
     }
@@ -98,8 +114,7 @@ const getProducts = asyncHandler(async (req, res) => {
     queryCommad.skip(skip).limit(limit);
     queryCommad
       .then(async (response) => {
-        console.log(response);
-        const counts = await Product.countDocuments(fomatedQueries);
+        const counts = await Product.find(q).countDocuments();
         return res.status(200).json({
           success: response ? true : false,
           counts,
@@ -116,7 +131,7 @@ const getProducts = asyncHandler(async (req, res) => {
 });
 const ratings = asyncHandler(async (req, res) => {
   const { _id } = req.user;
-  const { star, comment, pid } = req.body;
+  const { star, comment, pid, updatedAt } = req.body;
   if (!star || !pid) throw new Error("Missing input");
   const ratingProduct = await Product.findById(pid);
   const alreadyRating = ratingProduct?.rating?.find(
@@ -129,7 +144,11 @@ const ratings = asyncHandler(async (req, res) => {
         rating: { $elemMatch: alreadyRating },
       },
       {
-        $set: { "rating.$.star": star, "rating.$.comment": comment },
+        $set: {
+          "rating.$.star": star,
+          "rating.$.comment": comment,
+          "rating.$.updatedAt": updatedAt,
+        },
       },
       {
         new: true,
@@ -139,7 +158,7 @@ const ratings = asyncHandler(async (req, res) => {
     await Product.findByIdAndUpdate(
       pid,
       {
-        $push: { rating: { star, comment, postedBy: _id } },
+        $push: { rating: { star, comment, postedBy: _id, updatedAt } },
       },
       { new: true }
     );
